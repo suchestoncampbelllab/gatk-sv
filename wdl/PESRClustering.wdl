@@ -3,6 +3,7 @@ version 1.0
 import "Structs.wdl"
 import "TasksClusterBatch.wdl" as tasks_cluster
 import "TasksMakeCohortVcf.wdl" as tasks_cohort
+import "Utils.wdl" as util
 
 workflow ClusterPESR {
   input {
@@ -36,6 +37,7 @@ workflow ClusterPESR {
     RuntimeAttr? runtime_attr_svcluster
     RuntimeAttr? runtime_override_concat_vcfs_pesr
     RuntimeAttr? runtime_attr_multi_gatk_to_svtk_vcf
+    RuntimeAttr? runtime_attr_index_vcfs
   }
 
   call tasks_cluster.MultiSvtkToGatkVcf {
@@ -58,11 +60,25 @@ workflow ClusterPESR {
       runtime_attr_override=runtime_attr_exclude_intervals_pesr
   }
 
+  call util.IndexVcfs {
+    input:
+      vcfs=MultiExcludeIntervalsPESR.out,
+      sv_base_mini_docker=sv_base_mini_docker,
+      runtime_attr_override=runtime_attr_index_vcfs
+  }
+
+  scatter (maybe_vcf in IndexVcfs.vcfs_and_indexes) {
+    if (basename(maybe_vcf, ".vcf.gz") + ".vcf.gz" == basename(maybe_vcf)) {
+      File indexed_vcfs_ = maybe_vcf
+    }
+  }
+  Array[File] indexed_vcfs = select_all(indexed_vcfs_)
+
   Array[String] contigs = transpose(read_tsv(contig_list))[0]
   scatter (contig in contigs) {
     call tasks_cluster.SVCluster {
       input:
-        vcfs=MultiExcludeIntervalsPESR.out,
+        vcfs=indexed_vcfs,
         ploidy_table=ploidy_table,
         output_prefix="~{batch}.~{caller}.~{contig}.clustered",
         contig=contig,

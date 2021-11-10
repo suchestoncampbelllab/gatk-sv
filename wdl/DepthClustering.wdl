@@ -12,6 +12,7 @@ workflow ClusterDepth {
     File ploidy_table
 
     File contig_list
+    File sample_list
     File exclude_intervals
     Float exclude_overlap_fraction
 
@@ -43,6 +44,7 @@ workflow ClusterDepth {
       bed=del_bed,
       script=cnv_bed_to_gatk_vcf_script,
       contig_list=contig_list,
+      sample_list=sample_list,
       ploidy_table=ploidy_table,
       output_prefix="~{batch}.depth.gatk_formatted.del",
       sv_pipeline_docker=sv_pipeline_docker,
@@ -54,6 +56,7 @@ workflow ClusterDepth {
       bed=dup_bed,
       script=cnv_bed_to_gatk_vcf_script,
       contig_list=contig_list,
+      sample_list=sample_list,
       ploidy_table=ploidy_table,
       output_prefix="~{batch}.depth.gatk_formatted.dup",
       sv_pipeline_docker=sv_pipeline_docker,

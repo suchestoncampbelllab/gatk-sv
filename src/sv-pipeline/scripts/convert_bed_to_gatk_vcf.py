@@ -180,14 +180,9 @@ def convert_bed_to_vcf(bed_path: Text,
     vcf_out.close()
 
 
-def __read_contigs(path: Text) -> List[Text]:
+def __read_list(path: Text) -> List[Text]:
     with open(path, 'r') as f:
         return [line.strip() for line in f]
-
-
-def __read_samples(bed_path: Text) -> Set[Text]:
-    with __open_bed(bed_path) as f:
-        return list(set([line.strip().split('\t')[4] for line in f if not line.startswith("#")]))
 
 
 def __open_bed(path: Text) -> IO[Text]:
@@ -231,6 +226,8 @@ def __parse_arguments(argv: List[Text]) -> argparse.Namespace:
                         help="BED file containing CNVs with columns: chr, start, end, name, sample, svtype, sources")
     parser.add_argument("--contigs", type=str, required=True,
                         help="List of contigs")
+    parser.add_argument("--samples", type=str, required=True,
+                        help="List of samples")
     parser.add_argument("--out", type=str, required=True,
                         help="Output VCF")
     parser.add_argument("--ploidy-table", type=str, required=True,
@@ -249,9 +246,9 @@ def main(argv: Optional[List[Text]] = None):
     if argv is None:
         argv = sys.argv
     arguments = __parse_arguments(argv)
-    contigs = set(__read_contigs(arguments.contigs))
+    contigs = __read_list(arguments.contigs)
+    samples = __read_list(arguments.samples)
     ploidy_dict = __parse_ploidy_table(arguments.ploidy_table)
-    samples = __read_samples(arguments.bed)
     convert_bed_to_vcf(
         bed_path=arguments.bed,
         vcf_path=arguments.out,

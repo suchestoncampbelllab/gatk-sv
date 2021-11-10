@@ -68,13 +68,13 @@ task SVCluster {
         set -euo pipefail
 
         function getJavaMem() {
-            # get JVM memory in GiB by getting total memory from /proc/meminfo
+            # get JVM memory in MiB by getting total memory from /proc/meminfo
             # and multiplying by java_mem_fraction
             cat /proc/meminfo \
                 | awk -v MEM_FIELD="$1" '{
                     f[substr($1, 1, length($1)-1)] = $2
                 } END {
-                    printf "%.2fG", f[MEM_FIELD] * ~{default="0.85" java_mem_fraction} / 1048576
+                    printf "%dM", f[MEM_FIELD] * ~{default="0.85" java_mem_fraction} / 1024
                 }'
         }
         JVM_MAX_MEM=$(getJavaMem MemTotal)
@@ -243,11 +243,11 @@ task MultiSvtkToGatkVcf {
         set -euo pipefail
         mkdir out/
         i=0
-        while read vcf; do
+        while read VCF; do
             NAME=$(basename $VCF .vcf.gz)
             SAMPLE_NUM=`printf %05d $i`
             python ~{default="/opt/sv-pipeline/scripts/format_svtk_vcf_for_gatk.py" script} \
-                --vcf $vcf \
+                --vcf $VCF \
                 --out out/$SAMPLE_NUM.$NAME.~{output_suffix}.vcf.gz \
                 --ploidy-table ~{ploidy_table} \
                 ~{"--remove-infos " + remove_infos} \
@@ -319,6 +319,7 @@ task CNVBedToGatkVcf {
     input {
         File bed
         File? script
+        File sample_list
         File contig_list
         File ploidy_table
         String output_prefix
@@ -345,6 +346,7 @@ task CNVBedToGatkVcf {
         python ~{default="/opt/sv-pipeline/scripts/convert_bed_to_gatk_vcf.py" script} \
             --bed ~{bed} \
             --out ~{output_prefix}.vcf.gz \
+            --samples ~{sample_list} \
             --contigs ~{contig_list} \
             --ploidy-table ~{ploidy_table}
         tabix ~{output_prefix}.vcf.gz

@@ -4,6 +4,7 @@ import "PESRClustering.wdl" as pesr
 import "DepthClustering.wdl" as depth
 import "ClusterBatchMetrics.wdl" as metrics
 import "TasksClusterBatch.wdl" as tasks
+import "Utils.wdl" as util
 
 workflow ClusterBatch {
   input {
@@ -46,7 +47,6 @@ workflow ClusterBatch {
     Boolean? run_module_metrics
     String? linux_docker  # required if run_module_metrics = true
     String? sv_pipeline_base_docker  # required if run_module_metrics = true
-    File? primary_contigs_list  # required if run_module_metrics = true
     File? baseline_depth_vcf  # baseline files are optional for metrics workflow
     File? baseline_manta_vcf
     File? baseline_wham_vcf
@@ -58,16 +58,26 @@ workflow ClusterBatch {
 
     Float? java_mem_fraction
 
+    RuntimeAttr? runtime_attr_ids_from_vcfs
     RuntimeAttr? runtime_attr_create_ploidy
     RuntimeAttr? runtime_attr_multi_svtk_to_gatk_vcf
     RuntimeAttr? runtime_attr_exclude_intervals_pesr
     RuntimeAttr? runtime_attr_svcluster_pesr
     RuntimeAttr? runtime_override_concat_vcfs_pesr
     RuntimeAttr? runtime_attr_multi_gatk_to_svtk_vcf
+    RuntimeAttr? runtime_attr_index_vcfs
     RuntimeAttr? runtime_attr_cnv_bed_to_gatk_vcf
     RuntimeAttr? runtime_override_concat_del_dup
     RuntimeAttr? runtime_attr_exclude_intervals_depth
     RuntimeAttr? runtime_attr_svcluster_depth
+  }
+
+  call util.GetSampleIdsFromVcfArray {
+    input:
+      vcfs=select_first([manta_vcfs, wham_vcfs, melt_vcfs]),
+      prefix="~{batch}.samples",
+      sv_base_mini_docker=sv_base_mini_docker,
+      runtime_attr_override=runtime_attr_ids_from_vcfs
   }
 
   call tasks.CreatePloidyTableFromPed {
@@ -107,7 +117,8 @@ workflow ClusterBatch {
         runtime_attr_exclude_intervals_pesr=runtime_attr_exclude_intervals_pesr,
         runtime_attr_svcluster=runtime_attr_svcluster_pesr,
         runtime_override_concat_vcfs_pesr=runtime_override_concat_vcfs_pesr,
-        runtime_attr_multi_gatk_to_svtk_vcf=runtime_attr_multi_gatk_to_svtk_vcf
+        runtime_attr_multi_gatk_to_svtk_vcf=runtime_attr_multi_gatk_to_svtk_vcf,
+        runtime_attr_index_vcfs=runtime_attr_index_vcfs,
     }
   }
 
@@ -136,7 +147,8 @@ workflow ClusterBatch {
         runtime_attr_exclude_intervals_pesr=runtime_attr_exclude_intervals_pesr,
         runtime_attr_svcluster=runtime_attr_svcluster_pesr,
         runtime_override_concat_vcfs_pesr=runtime_override_concat_vcfs_pesr,
-        runtime_attr_multi_gatk_to_svtk_vcf=runtime_attr_multi_gatk_to_svtk_vcf
+        runtime_attr_multi_gatk_to_svtk_vcf=runtime_attr_multi_gatk_to_svtk_vcf,
+        runtime_attr_index_vcfs=runtime_attr_index_vcfs,
     }
   }
 
@@ -165,7 +177,8 @@ workflow ClusterBatch {
         runtime_attr_exclude_intervals_pesr=runtime_attr_exclude_intervals_pesr,
         runtime_attr_svcluster=runtime_attr_svcluster_pesr,
         runtime_override_concat_vcfs_pesr=runtime_override_concat_vcfs_pesr,
-        runtime_attr_multi_gatk_to_svtk_vcf=runtime_attr_multi_gatk_to_svtk_vcf
+        runtime_attr_multi_gatk_to_svtk_vcf=runtime_attr_multi_gatk_to_svtk_vcf,
+        runtime_attr_index_vcfs=runtime_attr_index_vcfs,
     }
   }
 
@@ -176,6 +189,7 @@ workflow ClusterBatch {
       batch=batch,
       ploidy_table=CreatePloidyTableFromPed.out,
       contig_list=contig_list,
+      sample_list=GetSampleIdsFromVcfArray.out_file,
       exclude_intervals=depth_exclude_intervals,
       exclude_overlap_fraction=depth_exclude_overlap_fraction,
       clustering_algorithm=depth_clustering_algorithm,
@@ -210,7 +224,7 @@ workflow ClusterBatch {
         baseline_manta_vcf = baseline_manta_vcf,
         baseline_wham_vcf = baseline_wham_vcf,
         baseline_melt_vcf = baseline_melt_vcf,
-        contig_list = select_first([primary_contigs_list]),
+        contig_list = select_first([contig_list]),
         sv_base_mini_docker = sv_base_mini_docker,
         sv_pipeline_base_docker = select_first([sv_pipeline_base_docker]),
         linux_docker = select_first([linux_docker])

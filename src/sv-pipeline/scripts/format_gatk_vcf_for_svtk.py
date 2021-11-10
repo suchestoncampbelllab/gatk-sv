@@ -123,7 +123,7 @@ def convert(record: pysam.VariantRecord,
             else:
                 new_genotype['GT'] = (0, 0)
         else:
-            if 'GT' in genotype and sum(genotype['GT']) > 0:
+            if 'GT' in genotype and (genotype['GT'][0] is None or sum(genotype['GT']) > 0):
                 new_genotype['GT'] = (0, 1)
             else:
                 new_genotype['GT'] = (0, 0)

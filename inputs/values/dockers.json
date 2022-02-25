@@ -33,5 +33,7 @@
   "sv-pipeline-hail-virtual-env": "us.gcr.io/broad-dsde-methods/tbrookin/sv-pipeline-hail-virtual-env:c37c387",
   "sv-pipeline-updates-virtual-env": "us.gcr.io/broad-dsde-methods/tbrookin/sv-pipeline-updates-virtual-env:c37c387",
   "sv-pipeline-qc-virtual-env": "us.gcr.io/broad-dsde-methods/tbrookin/sv-pipeline-qc-virtual-env:c37c387",
-  "sv-pipeline-rdtest-virtual-env": "us.gcr.io/broad-dsde-methods/tbrookin/sv-pipeline-rdtest-virtual-env:c37c387"
+  "sv-pipeline-rdtest-virtual-env": "us.gcr.io/broad-dsde-methods/tbrookin/sv-pipeline-rdtest-virtual-env:c37c387",
+  "sv_utils_docker": "us.gcr.io/broad-dsde-methods/tbrookin/sv-utils:805d18b",
+  "gq_recalibrator_docker": "us.gcr.io/broad-dsde-methods/tbrookin/gatk:93d635a7ea"
 }

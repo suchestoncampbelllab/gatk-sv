@@ -1,0 +1,46 @@
+{
+  "BenchmarkGqFilter.data_label":
+    "HGDP and HGSV",
+  "BenchmarkGqFilter.original_scores": {
+    "label": "original",
+    "vcf": "gs://broad-dsde-methods-tbrookin/results/gq-filtering/inputs/hgdp_and_hgsv.cleaned_fixed.vcf.gz",
+    "pickled_scores_file": "gs://broad-dsde-methods-tbrookin/results/gq-filtering/2022-02-22_filter-homref/hgdp_and_hgsv.cleaned_fixed_gq.pickle.bz2",
+    "property": "gq",
+    "passing_score": 1
+  },
+  "BenchmarkGqFilter.pickled_variant_properties":
+    "gs://broad-dsde-methods-tbrookin/results/gq-filtering/2022-02-22_filter-homref/hgdp_and_hgsv.cleaned_fixed_svtype_svlen_gt.pickle.bz2",
+  "BenchmarkGqFilter.comparison_scores": [
+    {
+      "label": "recalibrated",
+      "vcf": "gs://broad-methods-cromwell-exec-bucket-instance-8/CrossValidateGqRecalibrator/8d36f296-6dad-49cc-b9e9-9c27ddfeaccd/call-DirectGqRecalibrator/RunGqRecalibrator/c8c2c0b4-202a-4e2d-a719-d01464658957/call-ApplyGqRecalibratorFilter/hgdp_and_hgsv.cleaned_fixed_gq_recalibrated.vcf.gz",
+      "vcf_index": "gs://broad-methods-cromwell-exec-bucket-instance-8/CrossValidateGqRecalibrator/8d36f296-6dad-49cc-b9e9-9c27ddfeaccd/call-DirectGqRecalibrator/RunGqRecalibrator/c8c2c0b4-202a-4e2d-a719-d01464658957/call-ApplyGqRecalibratorFilter/hgdp_and_hgsv.cleaned_fixed_gq_recalibrated.vcf.gz.tbi",
+      "pickled_scores_file": "gs://broad-methods-cromwell-exec-bucket-instance-8/CrossValidateGqRecalibrator/8d36f296-6dad-49cc-b9e9-9c27ddfeaccd/call-BenchmarkGqFilter/BenchmarkGqFilter/db8f81d1-6106-44c5-add1-2c3f2fe3bbb2/call-PicklComparisonScores/shard-0/PickleVcfProperties/8c82b461-335e-4647-be46-3bd3b113720d/call-ReadAndPickleProperties/hgdp_and_hgsv.cleaned_fixed_gq_recalibrated_sl.pickle.bz2",
+      "property": "sl",
+      "passing_score": 0
+    },
+    {
+      "label": "cross-validated",
+      "vcf": "gs://broad-methods-cromwell-exec-bucket-instance-8/CrossValidateGqRecalibrator/8d36f296-6dad-49cc-b9e9-9c27ddfeaccd/call-MergeRecalibratedTestVcfs/hgdp_and_hgsv.cleaned_fixed_cross_validated.vcf.gz",
+      "vcf_index": "gs://broad-methods-cromwell-exec-bucket-instance-8/CrossValidateGqRecalibrator/8d36f296-6dad-49cc-b9e9-9c27ddfeaccd/call-MergeRecalibratedTestVcfs/hgdp_and_hgsv.cleaned_fixed_cross_validated.vcf.gz.tbi",
+      "pickled_scores_file": "gs://broad-methods-cromwell-exec-bucket-instance-8/CrossValidateGqRecalibrator/8d36f296-6dad-49cc-b9e9-9c27ddfeaccd/call-BenchmarkGqFilter/BenchmarkGqFilter/db8f81d1-6106-44c5-add1-2c3f2fe3bbb2/call-PicklComparisonScores/shard-1/PickleVcfProperties/be191aa0-1b54-40df-8429-42c5da4df3c6/call-ReadAndPickleProperties/hgdp_and_hgsv.cleaned_fixed_cross_validated_sl.pickle.bz2",
+      "property": "sl",
+      "passing_score": 0
+    },
+    {
+      "label": "Xuefang",
+      "vcf": "gs://broad-dsde-methods-tbrookin/results/gq-filtering/inputs/hgdp_and_hgsv.cleaned.boost_and_minGQ.sorted.manual_filter_step2.vcf.gz",
+      "pickled_scores_file": "gs://broad-dsde-methods-tbrookin/results/gq-filtering/inputs/hgdp_and_hgsv.cleaned.boost_and_minGQ.sorted.manual_filter_step2_svtype_svlen_gt_gq.pickle.bz2",
+      "property": "gq",
+      "passing_score": 0
+    }
+  ],
+  "BenchmarkGqFilter.benchmark_args":
+    [],
+  "BenchmarkGqFilter.truth_overlap_info":
+    "gs://broad-methods-cromwell-exec-bucket-instance-8/CrossValidateGqRecalibrator/8d36f296-6dad-49cc-b9e9-9c27ddfeaccd/call-TrainGqRecalibrator/TrainGqRecalibrator/13f94f71-bfa6-4fe8-bdd1-f41fc9cacdd8/call-GetTruthOverlap/GetTruthOverlap/88fa28c8-4496-4685-a7a9-835f86de227a/call-GetTruthOverlapTask/truth_overlap.json",
+  "BenchmarkGqFilter.ped_file":
+    "gs://broad-dsde-methods-tbrookin/results/gq-filtering/inputs/HGDP_1KGP.ped",
+  "BenchmarkGqFilter.sv_utils_docker": "us.gcr.io/broad-dsde-methods/tbrookin/sv-utils:805d18b",
+  "BenchmarkGqFilter.sv_base_docker": "us.gcr.io/broad-dsde-methods/tbrookin/sv-base:c96d0e4"
+}

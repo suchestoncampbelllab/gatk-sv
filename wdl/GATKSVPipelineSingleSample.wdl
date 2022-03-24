@@ -49,6 +49,7 @@ workflow GATKSVPipelineSingleSample {
     File? case_counts_file
     File? case_pe_file
     File? case_sr_file
+    File? case_ld_file
 
     # Global files
     File ref_ped_file
@@ -105,6 +106,7 @@ workflow GATKSVPipelineSingleSample {
 
     # Coverage collection inputs
     File preprocessed_intervals
+    File? ld_locs_vcf
 
     # Manta inputs
     File manta_region_bed
@@ -176,6 +178,7 @@ workflow GATKSVPipelineSingleSample {
 
     Array[File] ref_pesr_disc_files
     Array[File] ref_pesr_split_files
+    Array[File] ref_pesr_ld_files
 
     File? gatk4_jar_override
     Float? gcnv_p_alt
@@ -228,11 +231,6 @@ workflow GATKSVPipelineSingleSample {
     RuntimeAttr? median_cov_runtime_attr        # Memory ignored, use median_cov_mem_gb_per_sample
     Float? median_cov_mem_gb_per_sample
 
-    RuntimeAttr? runtime_attr_shard_pe
-    RuntimeAttr? runtime_attr_merge_pe
-    RuntimeAttr? runtime_attr_shard_sr
-    RuntimeAttr? runtime_attr_merge_sr
-    RuntimeAttr? runtime_attr_set_sample
     RuntimeAttr? evidence_merging_bincov_runtime_attr # Disk space ignored, use evidence_merging_bincov_size_mb
 
     RuntimeAttr? cnmops_sample10_runtime_attr   # Memory ignored if cnmops_mem_gb_override_sample10 given
@@ -598,7 +596,7 @@ workflow GATKSVPipelineSingleSample {
   String? wham_docker_ = if (!defined(case_wham_vcf) && use_wham) then wham_docker else NONE_STRING_
 
   Boolean collect_coverage = !defined(case_counts_file)
-  Boolean collect_pesr = !defined(case_pe_file) || !defined(case_sr_file)
+  Boolean collect_pesr = !defined(case_pe_file) || !defined(case_sr_file) || !defined(case_ld_file)
 
   Boolean run_sampleevidence = defined(delly_docker_) || defined(manta_docker_) || defined(melt_docker_) || defined(scramble_docker_) || defined(wham_docker_) || collect_coverage || collect_pesr
 
@@ -617,6 +615,7 @@ workflow GATKSVPipelineSingleSample {
         reference_dict=reference_dict,
         reference_version=reference_version,
         preprocessed_intervals=preprocessed_intervals,
+        ld_locs_vcf = ld_locs_vcf,
         manta_region_bed=manta_region_bed,
         manta_region_bed_index=manta_region_bed_index,
         manta_jobs_per_cpu=manta_jobs_per_cpu,
@@ -659,13 +658,13 @@ workflow GATKSVPipelineSingleSample {
   File case_counts_file_ = select_first([case_counts_file, GatherSampleEvidence.coverage_counts])
   File case_pe_file_ = select_first([case_pe_file, GatherSampleEvidence.pesr_disc])
   File case_sr_file_ = select_first([case_sr_file, GatherSampleEvidence.pesr_split])
+  File case_ld_file_ = select_first([case_ld_file, GatherSampleEvidence.pesr_ld])
 
   call evidenceqc.EvidenceQC as EvidenceQC {
     input:
       batch=batch,
       samples=[sample_id],
       run_vcf_qc=run_vcf_qc,
-      genome_file=genome_file,
       counts=[case_counts_file_],
       run_ploidy = false,
       wgd_scoring_mask=wgd_scoring_mask,
@@ -712,12 +711,14 @@ workflow GATKSVPipelineSingleSample {
       bincov_matrix=EvidenceQC.bincov_matrix,
       bincov_matrix_index=EvidenceQC.bincov_matrix_index,
       PE_files=[case_pe_file_],
-      cytoband=cytobands,
-      mei_bed=mei_bed,
       ref_panel_PE_files=ref_pesr_disc_files,
       SR_files=[case_sr_file_],
       ref_panel_SR_files=ref_pesr_split_files,
+      LD_files=[case_ld_file_],
+      ref_panel_LD_files=ref_pesr_ld_files,
       inclusion_bed=inclusion_bed,
+      cytoband=cytobands,
+      mei_bed=mei_bed,
       contig_ploidy_model_tar = contig_ploidy_model_tar,
       gcnv_model_tars = gcnv_model_tars,
       gatk4_jar_override = gatk4_jar_override,
@@ -777,11 +778,6 @@ workflow GATKSVPipelineSingleSample {
       condense_counts_docker = condense_counts_docker,
       median_cov_runtime_attr=median_cov_runtime_attr,
       median_cov_mem_gb_per_sample=median_cov_mem_gb_per_sample,
-      runtime_attr_set_sample = runtime_attr_set_sample,
-      runtime_attr_shard_pe = runtime_attr_shard_pe,
-      runtime_attr_merge_pe = runtime_attr_merge_pe,
-      runtime_attr_shard_sr = runtime_attr_shard_sr,
-      runtime_attr_merge_sr = runtime_attr_merge_sr,
       evidence_merging_bincov_runtime_attr=evidence_merging_bincov_runtime_attr,
       cnmops_sample10_runtime_attr=cnmops_sample10_runtime_attr,
       cnmops_sample3_runtime_attr=cnmops_sample3_runtime_attr,

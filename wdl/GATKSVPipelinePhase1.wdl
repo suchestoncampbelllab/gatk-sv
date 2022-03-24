@@ -44,6 +44,7 @@ workflow GATKSVPipelinePhase1 {
     Array[File?]? BAF_files
     Array[File] PE_files
     Array[File] SR_files
+    Array[File]? LD_files
     Array[File] counts
     File? bincov_matrix
     File? bincov_matrix_index
@@ -129,14 +130,7 @@ workflow GATKSVPipelinePhase1 {
     Int matrix_qc_distance
 
     # Runtime parameters
-    RuntimeAttr? runtime_attr_shard_baf
-    RuntimeAttr? runtime_attr_merge_baf
-    RuntimeAttr? runtime_attr_shard_pe
-    RuntimeAttr? runtime_attr_merge_pe
-    RuntimeAttr? runtime_attr_shard_sr
-    RuntimeAttr? runtime_attr_merge_sr
-
-    RuntimeAttr? runtime_attr_set_sample
+    RuntimeAttr? runtime_attr_merge_evidence
     RuntimeAttr? evidence_merging_bincov_runtime_attr # Disk space ignored, use evidence_merging_bincov_size_mb
 
     RuntimeAttr? cnmops_sample10_runtime_attr   # Memory ignored if cnmops_mem_gb_override_sample10 given
@@ -248,6 +242,7 @@ workflow GATKSVPipelinePhase1 {
       BAF_files = BAF_files,
       PE_files = PE_files,
       SR_files = SR_files,
+      LD_files = LD_files,
       gvcfs = gvcfs,
       unpadded_intervals_file = unpadded_intervals_file,
       dbsnp_vcf = dbsnp_vcf,
@@ -319,13 +314,7 @@ workflow GATKSVPipelinePhase1 {
       gatk_docker=gatk_docker,
       gcnv_gatk_docker=gcnv_gatk_docker,
       condense_counts_docker=condense_counts_docker,
-      runtime_attr_set_sample = runtime_attr_set_sample,
-      runtime_attr_shard_baf = runtime_attr_shard_baf,
       runtime_attr_merge_baf = runtime_attr_merge_baf,
-      runtime_attr_shard_pe = runtime_attr_shard_pe,
-      runtime_attr_merge_pe = runtime_attr_merge_pe,
-      runtime_attr_shard_sr = runtime_attr_shard_sr,
-      runtime_attr_merge_sr = runtime_attr_merge_sr,
       evidence_merging_bincov_runtime_attr=evidence_merging_bincov_runtime_attr,
       cnmops_sample10_runtime_attr=cnmops_sample10_runtime_attr,
       cnmops_sample3_runtime_attr=cnmops_sample3_runtime_attr,

@@ -36,6 +36,7 @@ workflow GatherSampleEvidenceBatch {
     File preprocessed_intervals
     Float? mem_gb_for_collect_counts
     Int? disk_space_gb_for_collect_counts
+    File? ld_locs_vcf     # sites vcf for locus depth generation
 
     # Delly inputs
     File? delly_exclude_intervals_file  # Required if run_delly True
@@ -89,7 +90,6 @@ workflow GatherSampleEvidenceBatch {
 
     # Runtime configuration overrides
     RuntimeAttr? runtime_attr_merge_vcfs
-    RuntimeAttr? runtime_attr_baf_sample
     RuntimeAttr? runtime_attr_cram_to_bam
     RuntimeAttr? runtime_attr_delly
     RuntimeAttr? runtime_attr_delly_gather
@@ -118,14 +118,14 @@ workflow GatherSampleEvidenceBatch {
       input:
         bam_or_cram_file = bam_or_cram_files[i],
         bam_or_cram_index = if defined(bam_or_cram_indexes) then select_first([bam_or_cram_indexes])[i] else NONE_FILE_,
-        sample_id = sample_ids[i],
         requester_pays_crams = requester_pays_crams,
         revise_base_cram_to_bam = revise_base_cram_to_bam,
+        primary_contigs_fai = primary_contigs_fai,
+        sample_id = sample_ids[i],
         collect_coverage = collect_coverage,
         collect_pesr = collect_pesr,
         delete_intermediate_bam = delete_intermediate_bam,
         primary_contigs_list = primary_contigs_list,
-        primary_contigs_fai = primary_contigs_fai,
         reference_fasta = reference_fasta,
         reference_index = reference_index,
         reference_dict = reference_dict,
@@ -133,6 +133,7 @@ workflow GatherSampleEvidenceBatch {
         preprocessed_intervals = preprocessed_intervals,
         mem_gb_for_collect_counts = mem_gb_for_collect_counts,
         disk_space_gb_for_collect_counts = disk_space_gb_for_collect_counts,
+        ld_locs_vcf = ld_locs_vcf,
         delly_exclude_intervals_file = delly_exclude_intervals_file,
         delly_sv_types = delly_sv_types,
         manta_region_bed = manta_region_bed,
@@ -218,6 +219,8 @@ workflow GatherSampleEvidenceBatch {
     Array[File?] pesr_disc_index = GatherSampleEvidence.pesr_disc_index
     Array[File?] pesr_split = GatherSampleEvidence.pesr_split
     Array[File?] pesr_split_index = GatherSampleEvidence.pesr_split_index
+    Array[File?] pesr_ld = GatherSampleEvidence.pesr_ld
+    Array[File?] pesr_ld_index = GatherSampleEvidence.pesr_ld_index
 
     Array[File?] wham_vcf = GatherSampleEvidence.wham_vcf
     Array[File?] wham_index = GatherSampleEvidence.wham_index
@@ -225,3 +228,4 @@ workflow GatherSampleEvidenceBatch {
     File? metrics_file_sampleevidence = CatMetrics.out
   }
 }
+

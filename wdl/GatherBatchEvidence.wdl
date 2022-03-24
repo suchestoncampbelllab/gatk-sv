@@ -51,6 +51,8 @@ workflow GatherBatchEvidence {
     Array[File]? ref_panel_PE_files
     Array[File] SR_files
     Array[File]? ref_panel_SR_files
+    Array[File]? LD_files
+    Array[File]? ref_panel_LD_files
     File inclusion_bed
 
     # BAF generation
@@ -177,13 +179,8 @@ workflow GatherBatchEvidence {
     Float? median_cov_mem_gb_per_sample
 
     RuntimeAttr? evidence_merging_bincov_runtime_attr
-    RuntimeAttr? runtime_attr_shard_baf
+    RuntimeAttr? runtime_attr_merge_evidence
     RuntimeAttr? runtime_attr_merge_baf
-    RuntimeAttr? runtime_attr_shard_pe
-    RuntimeAttr? runtime_attr_merge_pe
-    RuntimeAttr? runtime_attr_shard_sr
-    RuntimeAttr? runtime_attr_merge_sr
-    RuntimeAttr? runtime_attr_set_sample
 
     RuntimeAttr? cnmops_sample10_runtime_attr   # Memory ignored if cnmops_mem_gb_override_sample10 given
     RuntimeAttr? cnmops_sample3_runtime_attr    # Memory ignored if cnmops_mem_gb_override_sample3 given
@@ -214,6 +211,7 @@ workflow GatherBatchEvidence {
   Array[String] all_samples = flatten(select_all([samples, ref_panel_samples]))
   Array[File] all_PE_files = flatten(select_all([PE_files, ref_panel_PE_files]))
   Array[File] all_SR_files = flatten(select_all([SR_files, ref_panel_SR_files]))
+  Array[File] all_LD_files = flatten(select_all([LD_files, ref_panel_LD_files]))
 
   if(defined(ref_panel_bincov_matrix)
      || !(defined(bincov_matrix) && defined(bincov_matrix_index))) {
@@ -307,23 +305,17 @@ workflow GatherBatchEvidence {
     }
   }
 
-  call bem.EvidenceMerging as EvidenceMerging {
+  call bem.BatchEvidenceMerging as BatchEvidenceMerging {
     input:
       samples = all_samples,
       BAF_files = if defined(BAFFromShardedVCF.baf_files) then BAFFromShardedVCF.baf_files else BAF_files,
       PE_files = all_PE_files,
       SR_files = all_SR_files,
-      inclusion_bed = inclusion_bed,
+      LD_files = all_LD_files,
       genome_file = genome_file,
       batch = batch,
-      sv_base_mini_docker = sv_base_mini_docker,
-      runtime_attr_set_sample = runtime_attr_set_sample,
-      runtime_attr_shard_baf = runtime_attr_shard_baf,
-      runtime_attr_merge_baf = runtime_attr_merge_baf,
-      runtime_attr_shard_pe = runtime_attr_shard_pe,
-      runtime_attr_merge_pe = runtime_attr_merge_pe,
-      runtime_attr_shard_sr = runtime_attr_shard_sr,
-      runtime_attr_merge_sr = runtime_attr_merge_sr
+      gatk_docker = gatk_docker,
+      runtime_attr_override = runtime_attr_merge_evidence
   }
 
   call cnmops.CNMOPS as CNMOPS {
@@ -490,22 +482,22 @@ workflow GatherBatchEvidence {
           runtime_attr = preprocess_calls_runtime_attr
       }
   }
-  File? baf_out = if defined(EvidenceMerging.merged_BAF) then EvidenceMerging.merged_BAF else BAFFromGVCFs.out
-  File? baf_out_index = if defined(EvidenceMerging.merged_BAF_idx) then EvidenceMerging.merged_BAF_idx else BAFFromGVCFs.out_index
+  File? baf_out = if defined(BatchEvidenceMerging.merged_BAF) then BatchEvidenceMerging.merged_BAF else BAFFromGVCFs.out
+  File? baf_out_index = if defined(BatchEvidenceMerging.merged_BAF_index) then BatchEvidenceMerging.merged_BAF_index else BAFFromGVCFs.out_index
   if (run_matrix_qc) {
     call mqc.MatrixQC as MatrixQC {
       input:
         distance = matrix_qc_distance,
         genome_file = genome_file,
         batch = batch,
-        PE_file = EvidenceMerging.merged_PE,
-        PE_idx = EvidenceMerging.merged_PE_idx,
+        PE_file = BatchEvidenceMerging.merged_PE,
+        PE_idx = BatchEvidenceMerging.merged_PE_index,
         BAF_file = select_first([baf_out]),
         BAF_idx = select_first([baf_out_index]),
         RD_file = merged_bincov_,
         RD_idx = merged_bincov_idx_,
-        SR_file = EvidenceMerging.merged_SR,
-        SR_idx = EvidenceMerging.merged_SR_idx,
+        SR_file = BatchEvidenceMerging.merged_SR,
+        SR_idx = BatchEvidenceMerging.merged_SR_index,
         ref_dict = ref_dict,
         sv_pipeline_docker = sv_pipeline_docker,
         runtime_attr_pesrbaf = matrix_qc_pesrbaf_runtime_attr,
@@ -520,8 +512,8 @@ workflow GatherBatchEvidence {
         name = batch,
         samples = samples,
         merged_BAF = select_first([baf_out]),
-        merged_SR = EvidenceMerging.merged_SR,
-        merged_PE = EvidenceMerging.merged_PE,
+        merged_SR = BatchEvidenceMerging.merged_SR,
+        merged_PE = BatchEvidenceMerging.merged_PE,
         merged_bincov = merged_bincov_,
         merged_dels = MergeDepth.del,
         merged_dups = MergeDepth.dup,
@@ -548,10 +540,10 @@ workflow GatherBatchEvidence {
   output {
     File? merged_BAF = baf_out
     File? merged_BAF_index = baf_out_index
-    File merged_SR = EvidenceMerging.merged_SR
-    File merged_SR_index = EvidenceMerging.merged_SR_idx
-    File merged_PE = EvidenceMerging.merged_PE
-    File merged_PE_index = EvidenceMerging.merged_PE_idx
+    File merged_SR = BatchEvidenceMerging.merged_SR
+    File merged_SR_index = BatchEvidenceMerging.merged_SR_index
+    File merged_PE = BatchEvidenceMerging.merged_PE
+    File merged_PE_index = BatchEvidenceMerging.merged_PE_index
     File merged_bincov = merged_bincov_
     File merged_bincov_index = merged_bincov_idx_
 

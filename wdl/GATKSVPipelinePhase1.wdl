@@ -48,19 +48,8 @@ workflow GATKSVPipelinePhase1 {
     Array[File] counts
     File? bincov_matrix
     File? bincov_matrix_index
-    File inclusion_bed
-
-    # BAF generation if BAF_files unavailable
-    # BAF Option #1, gVCFs
-    Array[File]? gvcfs
-    File? unpadded_intervals_file
-    File? dbsnp_vcf
-    File? dbsnp_vcf_index
-    File? gvcf_gcs_project_for_requester_pays
 
     # BAF Option #2, position-sharded VCFs
-    Array[File]? snp_vcfs
-    File? snp_vcf_header  # Only use if snp vcfs are unheadered
 
     # gCNV inputs
     File contig_ploidy_model_tar
@@ -99,7 +88,6 @@ workflow GATKSVPipelinePhase1 {
     Float? gcnv_caller_external_admixing_rate
     Boolean? gcnv_disable_annealing
 
-    Float? ploidy_sample_psi_scale
     Int ref_copy_number_autosomal_contigs
     Array[String]? allosomal_contigs
 
@@ -243,19 +231,9 @@ workflow GATKSVPipelinePhase1 {
       PE_files = PE_files,
       SR_files = SR_files,
       LD_files = LD_files,
-      gvcfs = gvcfs,
-      unpadded_intervals_file = unpadded_intervals_file,
-      dbsnp_vcf = dbsnp_vcf,
-      dbsnp_vcf_index = dbsnp_vcf_index,
-      gvcf_gcs_project_for_requester_pays = gvcf_gcs_project_for_requester_pays,
-      ref_fasta = reference_fasta,
-      ref_fasta_index = reference_index,
       ref_dict = reference_dict,
-      snp_vcfs = snp_vcfs,
-      snp_vcf_header = snp_vcf_header,
       cytoband = cytoband,
       mei_bed = mei_bed,
-      inclusion_bed = inclusion_bed,
       counts = counts,
       bincov_matrix = bincov_matrix,
       bincov_matrix_index = bincov_matrix_index,
@@ -314,7 +292,6 @@ workflow GATKSVPipelinePhase1 {
       gatk_docker=gatk_docker,
       gcnv_gatk_docker=gcnv_gatk_docker,
       condense_counts_docker=condense_counts_docker,
-      runtime_attr_merge_baf = runtime_attr_merge_baf,
       evidence_merging_bincov_runtime_attr=evidence_merging_bincov_runtime_attr,
       cnmops_sample10_runtime_attr=cnmops_sample10_runtime_attr,
       cnmops_sample3_runtime_attr=cnmops_sample3_runtime_attr,
@@ -333,6 +310,7 @@ workflow GATKSVPipelinePhase1 {
       runtime_attr_case = runtime_attr_case,
       runtime_attr_postprocess = runtime_attr_postprocess,
       runtime_attr_explode = runtime_attr_explode,
+      runtime_attr_merge_evidence = runtime_attr_merge_evidence,
       run_module_metrics = run_batchevidence_metrics,
       primary_contigs_list = primary_contigs_list,
       sv_pipeline_base_docker = sv_pipeline_base_docker

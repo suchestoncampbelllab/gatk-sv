@@ -89,7 +89,6 @@ workflow GatherSampleEvidenceBatch {
     String cloud_sdk_docker
 
     # Runtime configuration overrides
-    RuntimeAttr? runtime_attr_merge_vcfs
     RuntimeAttr? runtime_attr_cram_to_bam
     RuntimeAttr? runtime_attr_delly
     RuntimeAttr? runtime_attr_delly_gather
@@ -169,7 +168,6 @@ workflow GatherSampleEvidenceBatch {
         gatk_docker_pesr_override = gatk_docker_pesr_override,
         genomes_in_the_cloud_docker = genomes_in_the_cloud_docker,
         cloud_sdk_docker = cloud_sdk_docker,
-        runtime_attr_merge_vcfs = runtime_attr_merge_vcfs,
         runtime_attr_cram_to_bam = runtime_attr_cram_to_bam,
         runtime_attr_delly = runtime_attr_delly,
         runtime_attr_delly_gather = runtime_attr_delly_gather,

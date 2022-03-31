@@ -51,12 +51,6 @@ workflow GATKSVPipelineBatch {
     # BAF Generation (if baf_files unavailable)
     # BAF Option #1 (provide all)
     # From single-sample gVCFS
-    Array[File]? gvcfs
-
-    # BAF Option #2
-    # From multi-sample VCFs (sharded by position)
-    Array[File]? snp_vcfs
-    File? snp_vcf_header # Required only if VCFs are unheadered
 
     # Merge contig vcfs at each stage of MakeCohortVcf for QC
     Boolean makecohortvcf_merge_cluster_vcfs = false
@@ -236,9 +230,6 @@ workflow GATKSVPipelineBatch {
       melt_vcfs=melt_vcfs_,
       scramble_vcfs=scramble_vcfs_,
       wham_vcfs=wham_vcfs_,
-      gvcfs=gvcfs,
-      snp_vcfs=snp_vcfs,
-      snp_vcf_header=snp_vcf_header,
       cnmops_chrom_file=autosome_file,
       cnmops_allo_file=allosome_file,
       allosome_contigs=allosome_file,

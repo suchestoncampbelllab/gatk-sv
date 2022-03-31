@@ -166,7 +166,6 @@ workflow GATKSVPipelineSingleSample {
     ############################################################
 
     # Parameters
-    File inclusion_bed
     Int min_svsize                  # Minimum SV length to include
 
     # gCNV inputs
@@ -703,8 +702,6 @@ workflow GATKSVPipelineSingleSample {
       ped_file=ref_ped_file,
       genome_file=genome_file,
       primary_contigs_fai=primary_contigs_fai,
-      ref_fasta=reference_fasta,
-      ref_fasta_index=reference_index,
       ref_dict=reference_dict,
       counts=[case_counts_file_],
       ref_panel_bincov_matrix=ref_panel_bincov_matrix,
@@ -716,7 +713,6 @@ workflow GATKSVPipelineSingleSample {
       ref_panel_SR_files=ref_pesr_split_files,
       LD_files=[case_ld_file_],
       ref_panel_LD_files=ref_pesr_ld_files,
-      inclusion_bed=inclusion_bed,
       cytoband=cytobands,
       mei_bed=mei_bed,
       contig_ploidy_model_tar = contig_ploidy_model_tar,

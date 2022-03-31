@@ -100,7 +100,6 @@ workflow GatherSampleEvidence {
     String cloud_sdk_docker
 
     # Runtime configuration overrides
-    RuntimeAttr? runtime_attr_merge_vcfs
     RuntimeAttr? runtime_attr_cram_to_bam
     RuntimeAttr? runtime_attr_delly
     RuntimeAttr? runtime_attr_delly_gather

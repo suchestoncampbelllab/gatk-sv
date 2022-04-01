@@ -120,7 +120,6 @@ workflow GATKSVPipelineSingleSample {
     Float? insert_size
     Int? read_length
     Float? coverage
-    File? metrics_intervals
     Int? pf_reads_improper_pairs
     Float? pct_chimeras
     Float? total_reads
@@ -132,8 +131,6 @@ workflow GATKSVPipelineSingleSample {
     Boolean? run_sampleevidence_metrics = false
 
     # Runtime configuration overrides
-    RuntimeAttr? runtime_attr_baf
-    RuntimeAttr? runtime_attr_baf_gather
     RuntimeAttr? runtime_attr_cram_to_bam
     RuntimeAttr? runtime_attr_manta
     RuntimeAttr? runtime_attr_melt_coverage
@@ -624,7 +621,6 @@ workflow GATKSVPipelineSingleSample {
         insert_size=insert_size,
         read_length=read_length,
         coverage=coverage,
-        metrics_intervals=metrics_intervals,
         pf_reads_improper_pairs=pf_reads_improper_pairs,
         pct_chimeras=pct_chimeras,
         total_reads=total_reads,

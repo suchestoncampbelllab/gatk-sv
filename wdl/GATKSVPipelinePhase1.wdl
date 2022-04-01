@@ -20,8 +20,6 @@ workflow GATKSVPipelinePhase1 {
     File ped_file
     File genome_file
     File contigs          # .fai file of included contigs
-    File reference_fasta
-    File reference_index    # Index (.fai), must be in same dir as fasta
     File reference_dict     # Dictionary (.dict), must be in same dir as fasta
 
     String sv_base_mini_docker
@@ -205,7 +203,6 @@ workflow GATKSVPipelinePhase1 {
     RuntimeAttr? runtime_attr_exclude_outliers
     RuntimeAttr? runtime_attr_cat_outliers
     RuntimeAttr? runtime_attr_filter_samples
-    RuntimeAttr? runtime_attr_get_male_only
 
     ############################################################
     ## Module metrics parameters for GatherBatchEvidence, ClusterBatch, GenerateBatchMetrics, FilterBatch metrics

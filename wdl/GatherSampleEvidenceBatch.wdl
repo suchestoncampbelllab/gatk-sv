@@ -54,7 +54,6 @@ workflow GatherSampleEvidenceBatch {
     Array[Float]? insert_size
     Array[Int]? read_length
     Array[Float]? coverage
-    File? metrics_intervals
     Array[Float]? pct_chimeras
     Array[Float]? total_reads
     Array[Int]? pf_reads_improper_pairs
@@ -144,7 +143,6 @@ workflow GatherSampleEvidenceBatch {
         insert_size = if defined(insert_size) then select_first([insert_size])[i] else NONE_FLOAT_,
         read_length = if defined(read_length) then select_first([read_length])[i] else NONE_INT_,
         coverage = if defined(coverage) then select_first([coverage])[i] else NONE_FLOAT_,
-        metrics_intervals = metrics_intervals,
         pct_chimeras = if defined(pct_chimeras) then select_first([pct_chimeras])[i] else NONE_FLOAT_,
         total_reads = if defined(total_reads) then select_first([total_reads])[i] else NONE_FLOAT_,
         pf_reads_improper_pairs = if defined(pf_reads_improper_pairs) then select_first([pf_reads_improper_pairs])[i] else NONE_INT_,

@@ -72,7 +72,6 @@ workflow GATKSVPipelineBatch {
     File contig_ploidy_model_tar
     Array[File] gcnv_model_tars
 
-    File? outlier_cutoff_table
     File qc_definitions
 
     # Run module metrics - all modules on by default for batch WDL
@@ -213,8 +212,6 @@ workflow GATKSVPipelineBatch {
       ped_file=ped_file,
       genome_file=genome_file,
       contigs=primary_contigs_fai,
-      reference_fasta=reference_fasta,
-      reference_index=reference_index,
       reference_dict=reference_dict,
       contig_ploidy_model_tar=contig_ploidy_model_tar,
       gcnv_model_tars=gcnv_model_tars,

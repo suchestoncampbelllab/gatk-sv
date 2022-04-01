@@ -67,7 +67,6 @@ workflow GatherSampleEvidence {
     Float? insert_size
     Int? read_length
     Float? coverage
-    File? metrics_intervals
     Float? pct_chimeras
     Float? total_reads
     Int? pf_reads_improper_pairs

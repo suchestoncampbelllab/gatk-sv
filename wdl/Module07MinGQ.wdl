@@ -10,7 +10,6 @@ workflow Module07MinGQ {
   input {
     String sv_base_mini_docker
     String sv_pipeline_docker
-    String sv_pipeline_updates_docker
     File vcf
     File vcf_idx
     String prefix
@@ -88,15 +87,14 @@ workflow Module07MinGQ {
         vcf_idx=ReviseSVtypeMEI.updated_vcf_idx,
         sv_per_shard=1000,
         prefix="~{prefix}.~{contig[0]}",
-        sv_pipeline_docker=sv_pipeline_docker,
-        sv_pipeline_updates_docker=sv_pipeline_updates_docker
+        sv_pipeline_docker=sv_pipeline_docker
     }
     if (defined(pcrplus_samples_list)) {
       call SplitPcrVcf {
         input:
           vcf=getAFs.vcf_wAFs,
           prefix="~{prefix}.~{contig[0]}",
-          pcrplus_samples_list=pcrplus_samples_list,
+          pcrplus_samples_list=select_first([pcrplus_samples_list]),
           sv_base_mini_docker=sv_base_mini_docker
       }
     }
@@ -114,8 +112,7 @@ workflow Module07MinGQ {
         sv_per_shard=1000,
         prefix="~{prefix}.~{contig[0]}",
         sample_pop_assignments=GetSampleLists.sample_PCR_labels,
-        sv_pipeline_docker=sv_pipeline_docker,
-        sv_pipeline_updates_docker=sv_pipeline_updates_docker
+        sv_pipeline_docker=sv_pipeline_docker
     }
     # Gather table of AC/AN/AF for PCRPLUS and PCRMINUS samples
     call GetAfTables {

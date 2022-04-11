@@ -50,20 +50,9 @@ workflow BatchEvidenceMerging {
     }
   }
   if (!defined(BAF_files)) {
-    call MergeEvidence as MergeLDEvidence {
-      input:
-        files = LD_files,
-        batch = batch,
-        evidence = "ld",
-        samples = samples,
-        genome_file = genome_file,
-        gatk_docker = gatk_docker,
-        runtime_attr_override = runtime_attr_override
-    }
-
     call LDtoBAF {
       input:
-        ld_file = MergeLDEvidence.out,
+        LD_files = LD_files,
         batch = batch,
         samples = samples,
         genome_file = genome_file,
@@ -135,7 +124,7 @@ task MergeEvidence {
 
 task LDtoBAF {
   input {
-    File ld_file
+    Array[File] LD_files
     String batch
     Array[String] samples
     File genome_file
@@ -143,7 +132,7 @@ task LDtoBAF {
     RuntimeAttr? runtime_attr_override
   }
 
-  Int disk_size = 10 + ceil(size(ld_file, "GiB") * 2)
+  Int disk_size = 10 + ceil(size(LD_files, "GiB") * 2)
 
   RuntimeAttr default_attr = object {
     cpu_cores: 1,
@@ -163,10 +152,11 @@ task LDtoBAF {
 
     set -euo pipefail
 
+    mv ~{write_lines(LD_files)} inputs.list
     mv ~{write_lines(samples)} samples.list
     awk 'BEGIN{FS=OFS="\t"}{print "@SQ\tSN:"$1, "LN:"$2}' genome_file > dictionary
 
-    /gatk/gatk LDtoBAF -F ~{ld_file} --sample-names samples.list --dictionary dictionary -O "~{batch}.baf.txt.gz"
+    /gatk/gatk LocusDepthtoBAF -F inputs.list --sample-names samples.list --dictionary dictionary -O "~{batch}.baf.txt.gz"
 
     tabix -f -s1 -b2 -e2 "~{batch}.baf.txt.gz"
 
